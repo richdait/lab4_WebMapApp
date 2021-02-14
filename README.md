@@ -7,4 +7,4 @@
 </br>
 <h1> <p align="center"> <b> Lab 3: Web Map Application</b> </p>
 </br>
-<h5> <p align="left"> The purpose of this lab is to create an interactive web map of airports in the United States. Two geoJSON files are used: airports and usstates. Ultimately, </p>
+<h5> <p align="left"> The purpose of lab 3 is to create an [interactive web map](https://github.com/jakobzhao/geog458/tree/master/labs/lab03) with a thematic style that illustrates a chosen statistic or topic. This choropleth map in particular, displays the number of airports within each state, according to pre-defined data intervals. Additionally, symbols are included to represent airports themselves. Two geoJSON files were used: airports and usstates. The former </p>
