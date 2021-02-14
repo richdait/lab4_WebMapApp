@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>The Number of Airports Within Each State.</title>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"/>
+
+    <!-- Font Awesome allows the addition of icons by CSS classes. -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css"/>
+    <link href="https://fonts.googleapis.com/css?family=Titillium+Web" rel="stylesheet">
+    <link rel="stylesheet" href="css/main.css"/>
+
+<style>
+html, body, #map { width: 100%; height: 100%; margin: 0; background: #fff; }
+
+</style>
+
+<script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-ajax/2.1.0/leaflet.ajax.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/1.3.4/chroma.min.js"></script>
+
+<!-- In order to add and read the required GeoJSON file, the leaflet-ajax library is required. -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-ajax/2.1.0/leaflet.ajax.min.js"></script>
+
+</head>
+<body>
+<div id="map"></div>
+<script>
+
+// Creates a map object.
+var mymap = L.map('map', {
+    center: [45.5, -114.5],
+    zoom: 3.5,
+    maxZoom: 12,
+    minZoom:3,
+    detectRetina: true // detect whether the sceen is high resolution or not.
+});
+
+// Adds a base map.
+L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
+attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>'
+}).addTo(mymap);
+
+// Adds U.S. States Boundaries GeoJSON Data
+// Null variable the U.S. boundaries data
+var boundaries = null;
+// Get usstates GeoJSON file and attaches it to the map when it loads.
+boundaries = L.geoJson.ajax("assets/usstates.geojson",{
+    attribution: 'U.S. States Data &copy; HIFLD | Washington counties &copy; Washington Data & Research | Base Map &copy; CartoDB | Made By Bo Zhao'
+});
+// Adds boundaries to the map.
+boundaries.addTo(mymap);
+
+// Adds Airports GeoJSON Data
+// Null variable the airports data
+var airports = null;
+
+// Builds up a set of colors from colorbrewer's dark2 category
+var colors = chroma.scale('Oranges').mode('lab').colors(12);
+
+// Dynamically appends style classes to this page. This style classes will be used for colorize the markers.
+for (i = 0; i < 13; i++) {
+    $('head').append($("<style> .marker-color-" + (i + 1).toString() + " { color: " + colors[i] + "; font-size: 15px; text-shadow: 0 0 3px #ffffff;} </style>"));
+}
+
+// Get airports GeoJSON file and attaches it to the map when it loads.
+airports = L.geoJson.ajax("assets/airports.geojson",{
+
+  onEachFeature: function (feature, layer) {
+      layer.bindPopup(feature.properties.CITY);
+      return feature.properties.IATA;
+  },
+  pointToLayer: function (feature, latlng) {
+      var id = 0;
+      if (feature.properties.CITY == "MOJAVE") { id = 0; }
+      else if (feature.properties.CITY == "AUGUSTA")  { id = 1; }
+      else { id = 12;}
+      return L.marker(latlng, {icon: L.divIcon({className: 'fa fa-signal marker-color-' + (id + 1).toString() })});
+  },
+    attribution: 'Airports Data &copy; HIFLD | Washington counties &copy; Washington Data & Research | Base Map &copy; CartoDB | Made By Bo Zhao'
+});
+// Adds the airports to the map.
+airports.addTo(mymap);
+
+// Set function for color ramp
+colors = chroma.scale('Oranges').colors(5);
+
+function setColor(no_of_airports) {
+    var id = 0;
+    if (no_of_airports > 45) { id = 5; }
+    else if (no_of_airports > 35 && no_of_airports <= 45) { id = 4; }
+    else if (no_of_airports > 25 && no_of_airports <= 35) { id = 3; }
+    else if (no_of_airports > 15 && no_of_airports <= 25) { id = 2; }
+    else if (no_of_airports > 5 && no_of_airports <= 15) { id = 1; }
+    else  { id = 0; }
+    return colors[id];
+}
+
+function style(feature) {
+    return {
+        fillColor: setColor(feature.properties.count),
+        fillOpacity: 5,
+        weight: 3,
+        opacity: 4,
+        color: 'white',
+        dashArray: '1'
+    };
+}
+
+L.geoJson.ajax("assets/usstates.geojson", {style: style}).addTo(mymap);
+
+
+</script>
+</body>
+</html>
