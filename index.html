@@ -10,6 +10,7 @@
     <link href="https://fonts.googleapis.com/css?family=Titillium+Web" rel="stylesheet">
     <link rel="stylesheet" href="css/main.css"/>
 
+
 <style>
 
 html, body, #map { width: 100%; height: 100%; margin: 0; background: #fff; }
@@ -55,10 +56,14 @@ html, body, #map { width: 100%; height: 100%; margin: 0; background: #fff; }
 
 <!-- In order to add and read the required GeoJSON file, the leaflet-ajax library is required. -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-ajax/2.1.0/leaflet.ajax.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/leaflet-spotlight@1.0.0/index.js"></script>
+
 
 </head>
 <body>
 <div id="map"></div>
+
+</div>
 <script>
 
 // Creates a map object.
@@ -70,6 +75,7 @@ var mymap = L.map('map', {
     detectRetina: true // detect whether the sceen is high resolution or not.
 });
 
+
 // Adds a base map.
 L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
 attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a>'
@@ -78,18 +84,9 @@ attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStree
 // Adds U.S. States Boundaries GeoJSON Data
 // Null variable the U.S. boundaries data
 var boundaries = null;
+
 // Get usstates GeoJSON file and attaches it to the map when it loads.
-boundaries = L.geoJson.ajax("assets/usstates.geojson",{
-
-  onEachFeature: function (feature, layer) {
-      layer.bindPopup(feature.properties.latlng);
-      return feature.properties.count;
-  },
-  pointToLayer: function (feature, latlng) {
-    return L.marker(latlng, {icon: L.divIcon({className: 'fa fa-signal marker-color-' + (id + 1).toString() })});
-
-  },
-});
+boundaries = L.geoJson.ajax("assets/usstates.geojson");
 
 // Adds boundaries to the map.
 boundaries.addTo(mymap);
@@ -120,12 +117,11 @@ airports = L.geoJson.ajax("assets/airports.geojson",{
   },
   pointToLayer: function (feature, latlng) {
       var id = 0;
-      if (feature.properties.CITY == "MOJAVE") { id = 0; }
-      else if (feature.properties.CITY == "AUGUSTA")  { id = 1; }
-      else { id = 12;}
-      return L.marker(latlng, {icon: L.divIcon({className: 'fa fa-signal marker-color-' + (id + 1).toString() })});
+      if (feature.properties.CNTL_TWR == "Y") { id = 1; }
+      else { id = 2;}
+      return L.marker(latlng, {icon: L.divIcon({className: 'fa fa-plane marker-color-black' + (id + 1).toString() })});
   },
-    attribution: 'Data.gov; airports.geoJSON | Mike Bostock of D3; usstates.geoJSON | Basemap & copy; OpenStreetMap | Made By Richard Dait'
+    attribution: 'Data.gov; airports.geoJSON | Mike Bostock of D3; usstates.geoJSON | Font Awesome; Plane Marker | OpenStreetMap ; Basemap | Made By Richard Dait'
 });
 // Adds the airports to the map.
 airports.addTo(mymap);
@@ -183,11 +179,28 @@ legend.addTo(mymap);
 // Adds a scale bar to map
 L.control.scale({position: 'bottomleft'}).addTo(mymap);
 
-var marker = L.marker([47.6062, -122.3321]).addTo(mymap);
+var marker = L.marker([47.4502, -122.3088], {bounceOnAdd: true});
 
-marker.bindPopup("<b>PNW!</b>").openPopup();
+marker.bindPopup("This is SeaTac airport.", {editable: true}).addTo(mymap);
+marker.on('click', function () {
+  marker.bounce({duration: 500, height: 100});
 
+var popup = L.marker()
+.setLatLng([45.5051, -122.67])
+.setContent("I am a standalone popup.")
+.openOn(mymap);
 
+var popup = L.marker();
+
+function onMapClick(e) {
+  popup
+  .setLatLng(e.latlng)
+  .setContent("You clicked the map at " + e.latlng.toString())
+  .addTo(mymap);
+}
+mymap.on('mouseover', onMapClick);
+
+});
 
 </script>
 </body>
