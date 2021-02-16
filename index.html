@@ -176,7 +176,12 @@ legend.addTo(mymap);
 // Adds a scale bar to map
 L.control.scale({position: 'bottomleft'}).addTo(mymap);
 
-var marker = L.marker([47.4502, -122.3088], {bounceOnAdd: true});
+var seattleicon = L.icon({
+  iconUrl : 'img/space.jpg',
+  iconSize: [27, 45]
+});
+
+var marker = L.marker([47.4502, -122.3088], {icon : seattleicon}, {bounceOnAdd: true});
 
 marker.bindPopup("This is SeaTac airport.", {editable: true}).addTo(mymap);
 marker.on('click', function () {
