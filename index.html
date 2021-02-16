@@ -174,6 +174,10 @@ legend.addTo(mymap);
 // Adds a scale bar to map
 L.control.scale({position: 'bottomleft'}).addTo(mymap);
 
+var atlanta = L.popup()
+    .setLatLng([33.749, -84.3880])
+    .setContent('<p><center>Atlanta - <br>Busiest airport in America.</p>')
+    .openOn(mymap);
 
 var seattleicon = L.icon({
   iconUrl : 'img/space.jpg',
