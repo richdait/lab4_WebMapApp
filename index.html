@@ -106,8 +106,8 @@ for (i = 0; i < 13; i++) {
 airports = L.geoJson.ajax("assets/airports.geojson",{
 
   onEachFeature: function (feature, layer) {
-      layer.bindPopup(feature.properties.CITY);
-      return feature.properties.IATA;
+      layer.bindPopup(feature.properties.IATA);
+      return feature.properties.CITY;
   },
   pointToLayer: function (feature, latlng) {
       var id = 0;
