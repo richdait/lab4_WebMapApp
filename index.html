@@ -9,6 +9,8 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.css"/>
     <link href="https://fonts.googleapis.com/css?family=Titillium+Web" rel="stylesheet">
     <link rel="stylesheet" href="css/main.css"/>
+    <link rel="stylesheet" href="../src/leaflet-search.css" />
+
 
 <style>
 
@@ -47,6 +49,7 @@ html, body, #map { width: 100%; height: 100%; margin: 0; background: #fff; }
 }
 
 </style>
+<script src="https://unpkg.com/leaflet-search@2.3.7/dist/leaflet-search.src.js"></script>
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-ajax/2.1.0/leaflet.ajax.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.0/jquery.min.js"></script>
@@ -55,7 +58,6 @@ html, body, #map { width: 100%; height: 100%; margin: 0; background: #fff; }
 <!-- In order to add and read the required GeoJSON file, the leaflet-ajax library is required. -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet-ajax/2.1.0/leaflet.ajax.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/leaflet-spotlight@1.0.0/index.js"></script>
-
 
 </head>
 <body>
@@ -72,7 +74,6 @@ var mymap = L.map('map', {
     minZoom:3,
     detectRetina: true // detect whether the sceen is high resolution or not.
 });
-
 
 // Adds a base map.
 L.tileLayer('http://{s}.tile.osm.org/{z}/{x}/{y}.png', {
@@ -184,12 +185,20 @@ var seattleicon = L.icon({
   iconSize: [27, 45]
 });
 
-var marker = L.marker([47.4502, -122.3088], {icon : seattleicon}, {bounceOnAdd: true});
+var marker = L.marker([47.4502, -122.3088], {icon : seattleicon, bounceOnAdd:
+  'true', draggable: 'true', editable: 'true'});
 
-marker.bindPopup("This is SeaTac airport.", {editable: true}).addTo(mymap);
-marker.on('click', function () {
-  marker.bounce({duration: 500, height: 100});
+marker.bindPopup("This is SeaTac airport.").addTo(mymap);
+marker.on('click', function (e) {
+  marker.bounce(e.latlng, {duration: 100, height: 25});
 
+var searchLayer = new L.geoJson.ajax('assets/usstates.geoJSON', {
+  onEachFeature: function (feature, layer) {
+    layer.bindPopup(feature.properties.name);
+    return feature.properties.count;}});
+
+L.mymap('mymap', {searchcontrol: {layer: searchLayer, position: 'bottomright',
+propertyName: feature.properties.name}}).addTo(mymap);
 });
 
 </script>
